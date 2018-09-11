@@ -26,10 +26,8 @@ king kong|42|128|not required|2006-07-22|30.00|2006-10-15 09:14
 * INTERNAL_BID: The amount of days we estimate the work on this shot will take. (Floating-point number, between 0 and 65535)
 * CREATED_DATE: The time and date when this record is being added to the system. (Timestamp in YYYY-MM-DD HH:MM format)
 
-### Task
-Your first task is to parse and import the file into a simple datastore. You may use any file format that you want to implement to store the data. Records in the datastore should be unique by PROJECT, SHOT and VERSION. Subsequent imports with the same logical record should overwrite the earlier records.
-
-
+Your first task is to parse and import the file into a simple datastore.  
+You may use any file format that you want to implement to store the data. Records in the datastore should be unique by PROJECT, SHOT and VERSION. Subsequent imports with the same logical record should overwrite the earlier records.
 
 ## Query tool
 
@@ -77,7 +75,6 @@ Assume AND has higher precedence than OR. Parentheses can be added to change the
 PROJECT="the hobbit" AND (SHOT=1 OR SHOT=40)
 ```
 
-#### Example:
 ```shell
 $ ./query -s PROJECT,INTERNAL_BID -f 'PROJECT="the hobbit" OR PROJECT="lotr"'
 the hobbit,45.00
