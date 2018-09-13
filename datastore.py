@@ -1,5 +1,4 @@
 from hashlib import md5
-import values as v
 
 
 class Column:
@@ -29,16 +28,6 @@ class Column:
         return f'Column({self.name}, {self.value}, key={self.key})'
 
 
-project = Column('PROJECT', v.TxtVal(), True, desc='the project name or code name of the shot')
-shot    = Column('SHOT', v.TxtVal(), True, desc='the name of the shot')
-version = Column('VERSION', v.IntVal(), True, desc='the current version of the file')
-status  = Column('STATUS', v.TxtVal(_max=32), desc='the current status of the shot')
-finish  = Column('FINISH_DATE', v.DateVal(), desc='the date the work on the shot is scheduled to end')
-bid     = Column('INTERNAL_BID', v.FloatVal(), desc='the amount of days we estimate the work on this shot will take')
-created = Column('CREATED_DATE', v.TimeVal(), desc='the time and date when this record is being added to the system')
-COLUMNS = (project, shot, version, status, finish, bid, created)
-
-
 class Table:
     '''
     Summary
@@ -48,6 +37,7 @@ class Table:
     Arguments
     ---------
     * columns: a list of columns objects
+    * rows: a dict with 
 
     Constructor
     -----------
@@ -55,22 +45,40 @@ class Table:
 
     Methods
     -------
+    Table.factory: factory a table object by raw data, sorting accordingly the columns
+    >>> table = Table.factory([['PROJECT', 'SHOT', ...], ['the hobbit', '1', ...],...], COLUMNS)
+
     append: appends the specified row data, replacing existing ones by combined keys
     >>> table.append(['the hobbit', '1', '64', ...])
 
     merge: merges the specified list of rows data, relying on append
     >>> table.merge([['the hobbit', '1', ...], ['king kong', '42'], ...])
 
-    clear: purge all collected rows
-    >>> table.clear()
+    +: modify left table by adding tranformed rows from another table object
+       rows with same id are replaced by new data
+    >>> table + Table.factory(...)
+
+    iter: iterates over the values of rows
+    >>> for row in table:
+            ...
     '''
 
-    class RowError(ValueError):
+    class DataError(ValueError):
         '''
-        Indicates an invalid row has been appended to the table
+        Indicates invalid data have been tried to be appended to the table
         '''
 
-    def __init__(self, columns=COLUMNS):
+    @classmethod
+    def factory(cls, data, columns):
+        table = cls(columns)
+        for i, row in enumerate(data): 
+            if i == 0:
+                table._sort(row)
+            else:
+                table.append(row)
+        return table
+
+    def __init__(self, columns):
         self.columns = columns
         self.rows = {}
 
@@ -86,8 +94,11 @@ class Table:
     def __getitem__(self, _id):
         return self.rows[_id]
 
-    def clear(self):
-        self.rows.clear()
+    def __add__(self, other):
+        self.rows.update(other.rows)
+
+    def __repr__(self):
+        return f'Table(columns=({", ".join(c.name for c in self.columns)}), rows={len(self.rows)})'
 
     def merge(self, rows):
         for row in rows:
@@ -106,7 +117,7 @@ class Table:
 
     def _check(self, row):
         if len(row) != len(self.columns):
-            raise self.RowError('row data does not match column specification')
+            raise self.DataError('row data does not match column specification')
 
     def _keys(self, keys, column, val):
         if column.key:
@@ -115,3 +126,7 @@ class Table:
     def _id(self, keys):
         if keys:
             return md5(''.join(keys).encode()).hexdigest()
+    
+    def _sort(self, headers):
+        columns  = {column.name: column for column in self.columns}
+        self.columns = [columns[name] for name in headers]

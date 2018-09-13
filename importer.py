@@ -1,66 +1,91 @@
-from os import path
-import datastore as ds
-import values as v
+import gzip
+import pickle
+from os import path, stat
 
 
-class Worker:
+class Parser:
     '''
     Summary
     -------
-    Imports a pipe separated file with first row serving as header and each subsequent
+    Parse a pipe separated file with first row serving as header and each subsequent
     ones representing the dataset.
 
     Arguments
     ---------
-    * src: the path to the raw data file
-    * table: the table object used to transform raw data on load, read and write
+    * filename: the path to the pipe separated file data file
 
     Constructor
     -----------
-    >>> worker = Worker('./sample.txt', Table(COLUMNS))
+    >>>  parser = Parser('./sample.txt')
 
     Methods
     -------
-    write: store transformed and reduced data to the specified txt file
-    >>> worker.write('./datastore.txt')
-
-    read: read data back from stored file
-    >>> worker.read('./datastore.txt')
+    iter: return a generator with the file contents splitted by separator characters
+    >>> for line in parser:
+    >>>   ...
     '''
 
     SEPARATOR = '|'
 
-    def __init__(self, src, table=ds.Table()):
-        self.table = table
-        self.headers, self.raw = self._load(src)
+    def __init__(self, filename):
+        self.filename = path.abspath(filename)
 
-    def write(self, filename):
-        self._sort_columns()
-        self.table.merge(self.raw)
-        with open(path.abspath(filename), 'w+') as f:
-            print(self.SEPARATOR.join(self.headers), file=f)
-            for row in self.table:
-                print(self.SEPARATOR.join(self._val(v) for v in row), file=f)
+    def __iter__(self):
+        with open(self.filename, 'r') as f:
+            for line in f:
+                yield line.strip().split(self.SEPARATOR)
 
-    def read(self, filename):
-        headers, raw = self._load(filename)
-        self._sort_columns(headers)
-        self.table.clear()
-        self.table.merge(raw)
-        return list(self.table)
 
-    def _val(self, val):
-        if hasattr(val, 'strptime'):
-            val = val.strftime(v.TimeVal.FORMAT)
-        return str(val)
+class Storage:
+    '''
+    Summary
+    -------
+    Writes and reads transformed data by un/pickling and un/gzipping them accordingly
 
-    def _sort_columns(self, headers=None):
-        headers = headers or self.headers
-        columns  = {column.name: column for column in self.table.columns}
-        self.table.columns = [columns[name] for name in headers]
+    Arguments
+    ---------
+    * filename: the name of the file that store the data, the '.pickle' extension
+      is suffixed if missing
 
-    def _load(self, src=None):
-        src = src or self.src
-        with open(path.abspath(src), 'r') as f:
-            data = [l.strip().split(self.SEPARATOR) for l in f]
-            return data.pop(0), data
+    Constructor
+    -----------
+    >>> storage = Storage('./projects')
+
+    Methods
+    -------
+    write: write table data to the specified compressed file, if file exists, read data
+           before writing and replace file with merged data (mandatory to keep unique keys)
+    >>> worker.write(Table(COLUMNS))
+
+    read: read the compressed file and return a table object filled by data
+    >>> worker.read()
+    '''
+
+    EXT = '.pickle'
+
+    def __init__(self, filename):
+        self.filename = self._filename(filename)
+
+    def write(self, table):
+        table = self._table(table)
+        with gzip.open(self.filename, 'wb') as f:
+            pickle.dump(table, f)
+
+    def read(self):
+        with gzip.open(self.filename, 'rb') as f:
+            return pickle.load(f)
+
+    def _filename(self, filename):
+        if not filename.endswith(self.EXT):
+            filename = f'{filename}{self.EXT}' 
+        return path.abspath(filename)
+
+    def _table(self, table):
+        if self._exist():
+            existing = self.read()
+            existing + table
+            table = existing
+        return table
+
+    def _exist(self):
+        return path.isfile(self.filename) and stat(self.filename).st_size
