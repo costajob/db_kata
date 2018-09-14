@@ -5,8 +5,8 @@ class Val(object):
     '''
     Summary
     -------
-    Identifies an abstract class to be implemented by concrete ones.
-    Acts as a container for shared functionalities.
+    An abstract class representing a general value object, to be implemented
+    by concrete ones.
 
     Arguments
     ---------

@@ -33,7 +33,7 @@ class Parser:
     def __iter__(self):
         with open(self.filename, 'r') as f:
             for line in f:
-                yield line.strip().split(self.SEPARATOR)
+                yield tuple(line.strip().split(self.SEPARATOR))
 
 
 class Storage:
@@ -55,7 +55,7 @@ class Storage:
     -------
     write: write table data to the specified compressed file, if file exists, read data
            before writing and replace file with merged data (mandatory to keep unique keys)
-    >>> worker.write(Table(COLUMNS))
+    >>> worker.write(Table(...))
 
     read: read the compressed file and return a table object filled by data
     >>> worker.read()

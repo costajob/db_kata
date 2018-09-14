@@ -13,8 +13,8 @@ class TestImporter(unittest.TestCase):
     def test_parser(self):
         parser = im.Parser('./stubs/sample.txt')
         data = list(parser)
-        self.assertEqual(data[0], ['PROJECT', 'SHOT', 'VERSION', 'STATUS', 'FINISH_DATE', 'INTERNAL_BID', 'CREATED_DATE'])
-        self.assertEqual(data[-1], ['king kong', '42', '128', 'not required', '2006-07-22', '30.00', '2006-10-15 09:14'])
+        self.assertEqual(data[0], ('PROJECT', 'SHOT', 'VERSION', 'STATUS', 'FINISH_DATE', 'INTERNAL_BID', 'CREATED_DATE'))
+        self.assertEqual(data[-1], ('king kong', '42', '128', 'not required', '2006-07-22', '30.00', '2006-10-15 09:14'))
 
     def test_storage_filename(self):
         storage = im.Storage('./stubs/projects')

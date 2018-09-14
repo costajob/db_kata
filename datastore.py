@@ -86,7 +86,8 @@ class Table:
         return len(self.rows)
 
     def __iter__(self):
-        return (row for row in self.rows.values())
+        for row in self.rows.values():
+            yield tuple(zip(self.column_names, row))
     
     def __contains__(self, _id):
         return _id in self.rows
@@ -98,7 +99,11 @@ class Table:
         self.rows.update(other.rows)
 
     def __repr__(self):
-        return f'Table(columns=({", ".join(c.name for c in self.columns)}), rows={len(self.rows)})'
+        return f'Table(columns=({", ".join(self.column_names)}), rows={len(self.rows)})'
+
+    @property
+    def column_names(self):
+        return tuple(col.name for col in self.columns)
 
     def merge(self, rows):
         for row in rows:
@@ -113,7 +118,7 @@ class Table:
             data.append(val)
             self._keys(keys, col, val)
         _id = self._id(keys)
-        self.rows[_id] = data
+        self.rows[_id] = tuple(data)
 
     def _check(self, row):
         if len(row) != len(self.columns):
