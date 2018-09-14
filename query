@@ -1,0 +1,64 @@
+#! /usr/bin/env python3
+
+from argparse import ArgumentParser
+from numbers import Number
+from sys import argv
+from importer import Storage
+from query import Filter, Sorter, Selector, Bulk
+
+
+class CLI:
+    '''
+    Synopsis
+    --------
+    A plain CLI wrapper over the query.Bulk class.
+    '''
+
+    DESC = 'Select data from the specified datastore, by applying a set of operators.'
+    DEFAULT = './stubs/projects'
+
+    def __init__(self, args=argv[1:]):
+        self.args = args
+        self.opts = self._parser().parse_args(self.args)
+
+    def __call__(self):
+        storage = Storage(self.opts.datastore)
+        table = storage.read()
+        bulk = Bulk(self.filter, self.order, self.select)
+        for row in bulk(table):
+            print(','.join(str(value) for value in row))
+
+    @property
+    def filter(self):
+        if self.opts.filter:
+            return Filter(self.opts.filter)
+
+    @property
+    def order(self):
+        if self.opts.order:
+            return Sorter(self.opts.order)
+
+    @property
+    def select(self):
+        if self.opts.select:
+            return Selector(self.opts.select)
+
+    def _parser(self):
+        parser = ArgumentParser(description=self.DESC)
+        parser.add_argument('-d', '--datastore',
+                            default=self.DEFAULT,
+                            help='the datastore to select data from')
+        parser.add_argument('-s', '--select',
+                            type=str,
+                            help='select just specified column names, separated by comma')
+        parser.add_argument('-f', '--filter',
+                            type=str,
+                            help='filter column by specified value')
+        parser.add_argument('-o', '--order',
+                            type=str,
+                            help='sort data by specified column names, separated by comma')
+        return parser
+
+
+if __name__ == '__main__':
+    CLI()()

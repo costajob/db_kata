@@ -118,9 +118,12 @@ class Bulk:
     >>> bulk(Table(...))
     '''
 
-    PLAIN = lambda x: x
+    PLAIN = lambda _, x: x
 
-    def __init__(self, _filter=PLAIN, order=PLAIN, select=PLAIN):
+    def __init__(self, _filter, order, select):
+        _filter = _filter or self.PLAIN
+        order = order or self.PLAIN
+        select = select or self.PLAIN
         self.operators = (_filter, order, select)
 
     def __call__(self, data):
