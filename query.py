@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from numbers import Number
 from operator import itemgetter
 
@@ -79,7 +79,7 @@ class Selector(Operator):
 
     def _select(self, data):
         for row in data:
-            selected = {}
+            selected = OrderedDict()
             for qname in self.names:
                 for name, value in row:
                     if qname == name:
@@ -89,10 +89,7 @@ class Selector(Operator):
     def _group_by(self, data):
         self._check_aggregate()
         for group in self._groups(data).values():
-            if len(group) == 1:
-                yield(group[0])
-            else:
-                yield(self._aggregate(group))
+            yield(self._aggregate(group))
 
     def _groups(self, data):
         groups = defaultdict(list)
@@ -104,12 +101,12 @@ class Selector(Operator):
 
     def _aggregate(self, group):
         reduced = {}
-        for data in group:
-            for name, value in data:
+        for row in group:
+            for name, value in row:
                 aggregate = self.query[name]
                 if aggregate:
                     fn = getattr(self, f'_ag_{aggregate}')
-                    fn(name, dict(data), reduced)
+                    fn(name, dict(row), reduced)
                 else:
                     reduced[name] = value
         return self._transform(reduced)
@@ -125,31 +122,31 @@ class Selector(Operator):
                     reduced[name] = len(value)
         return tuple(reduced.items())
 
-    def _ag_max(self, name, data, reduced):
+    def _ag_max(self, name, row, reduced):
         if name not in reduced:
-            reduced[name] = data[name]
-        if reduced[name] < data[name]:
-            reduced[name] = data[name]
+            reduced[name] = row[name]
+        if reduced[name] < row[name]:
+            reduced[name] = row[name]
 
-    def _ag_min(self, name, data, reduced):
+    def _ag_min(self, name, row, reduced):
         if name not in reduced:
-            reduced[name] = data[name]
-        if reduced[name] > data[name]:
-            reduced[name] = data[name]
+            reduced[name] = row[name]
+        if reduced[name] > row[name]:
+            reduced[name] = row[name]
 
-    def _ag_sum(self, name, data, reduced):
-        if isinstance(data[name], Number):
+    def _ag_sum(self, name, row, reduced):
+        if isinstance(row[name], Number):
             if name not in reduced:
                 reduced[name] = 0
-            reduced[name] += data[name]
+            reduced[name] += row[name]
 
-    def _ag_collect(self, name, data, reduced):
+    def _ag_collect(self, name, row, reduced):
         if name not in reduced:
             reduced[name] = set()
-        reduced[name].add(data[name])
+        reduced[name].add(row[name])
     
-    def _ag_count(self, name, data, reduced):
-        self._ag_collect(name, data, reduced)
+    def _ag_count(self, name, row, reduced):
+        self._ag_collect(name, row, reduced)
 
 
 class Sorter(Operator):
