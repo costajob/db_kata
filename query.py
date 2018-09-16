@@ -200,29 +200,29 @@ class Filter:
         self.tokens = list(self._tokenize(query))
 
     def __call__(self, table):
-        evaluation = self._evaluate(table)
+        translation = self._translate(table)
         for row in table:
-            instr = evaluation
+            evaluation = translation
             for name, value in row:
-                instr = instr.replace(name, repr(value))
-            if(eval(instr)):
+                evaluation = evaluation.replace(name, repr(value))
+            if(eval(evaluation)):
                 yield(row)
     
-    def _evaluate(self, table):
-        evaluation = []
+    def _translate(self, table):
+        translation = []
         names = table.column_names
         for token in self.tokens:
             if token in names:
-                evaluation.append(token)
+                translation.append(token)
                 col = [col for col in table.columns if col.name == token][0]
             elif token == self.EQUAL:
-                evaluation.append('==')
+                translation.append('==')
             elif token in self.OPERANDS:
-                evaluation.append(token.lower())
+                translation.append(token.lower())
             else:
                 if col:
-                    evaluation.append(repr(col.value(token)))
-        return ' '.join(evaluation)
+                    translation.append(repr(col.value(token)))
+        return ' '.join(translation)
 
     def _tokenize(self, query):
         for token in self.REGEX.split(query):
