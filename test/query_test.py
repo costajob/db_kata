@@ -29,11 +29,25 @@ class TestQuery(unittest.TestCase):
         self.assertEqual(data[0], (('PROJECT', 'lotr'), ('SHOT', '3'), ('VERSION', 16), ('STATUS', 'finished'), ('FINISH_DATE', date(2001, 5, 15)), ('INTERNAL_BID', 15.0), ('CREATED_DATE', datetime(2001, 4, 1, 6, 47))))
         self.assertEqual(data[-1], (('PROJECT', 'the hobbit'), ('SHOT', '1'), ('VERSION', 64), ('STATUS', 'scheduled'), ('FINISH_DATE', date(2010, 5, 15)), ('INTERNAL_BID', 45.0), ('CREATED_DATE', datetime(2010, 4, 1, 13, 35))))
 
-    def test_filter(self):
+    def test_filter_date(self):
         _filter = qy.Filter('FINISH_DATE=2006-07-22')
         data = list(_filter(TABLE))
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], (('PROJECT', 'king kong'), ('SHOT', '42'), ('VERSION', 128), ('STATUS', 'not required'), ('FINISH_DATE', date(2006, 7, 22)), ('INTERNAL_BID', 30.0), ('CREATED_DATE', datetime(2006, 10, 15, 9, 14))))
+
+    def test_filter_or(self):
+        _filter = qy.Filter('PROJECT="the hobbit" OR PROJECT="lotr"')
+        data = list(_filter(TABLE))
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0], (('PROJECT', 'the hobbit'), ('SHOT', '1'), ('VERSION', 64), ('STATUS', 'scheduled'), ('FINISH_DATE', date(2010, 5, 15)), ('INTERNAL_BID', 45.0), ('CREATED_DATE', datetime(2010, 4, 1, 13, 35))))
+        self.assertEqual(data[1], (('PROJECT', 'lotr'), ('SHOT', '3'), ('VERSION', 16), ('STATUS', 'finished'), ('FINISH_DATE', date(2001, 5, 15)), ('INTERNAL_BID', 15.0), ('CREATED_DATE', datetime(2001, 4, 1, 6, 47))))
+
+    def test_filter_combo(self):
+        _filter = qy.Filter('PROJECT="the hobbit" AND (SHOT=1 OR SHOT=40)')
+        data = list(_filter(TABLE))
+        self.assertEqual(len(data), 2)
+        self.assertEqual(data[0], (('PROJECT', 'the hobbit'), ('SHOT', '1'), ('VERSION', 64), ('STATUS', 'scheduled'), ('FINISH_DATE', date(2010, 5, 15)), ('INTERNAL_BID', 45.0), ('CREATED_DATE', datetime(2010, 4, 1, 13, 35))))
+        self.assertEqual(data[1], (('PROJECT', 'the hobbit'), ('SHOT', '40'), ('VERSION', 32), ('STATUS', 'finished'), ('FINISH_DATE', date(2010, 5, 15)), ('INTERNAL_BID', 22.8), ('CREATED_DATE', datetime(2010, 3, 22, 1, 10))))
 
     def test_bulk_none(self):
         bulk = qy.Bulk(None, None, None)

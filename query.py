@@ -1,6 +1,8 @@
 from collections import defaultdict, OrderedDict
+import datetime
 from numbers import Number
 from operator import itemgetter
+import re
 
 
 class Operator(object):
@@ -12,8 +14,8 @@ class Operator(object):
 
     Arguments
     ---------
-    * query: the columns names followed by a colon and the
-      aggregate name (if any), than a comma before the next column name
+    * query: the columns names, followed by a colon and the aggregate 
+      name (if any), separated by comma
     '''
 
     SPLITTER = ','
@@ -57,9 +59,8 @@ class Selector(Operator):
 
     Methods
     -------
-    call: return a generator with the data selected by the specified 
-          tuple of pairs, if group is specified, group them by available
-          aggregates
+    call: return a generator with the data selected by specified names,
+          if group is specified, group them by available aggregates
     >>> selector = Selector('PROJECT,SHOT,VERSION')
     >>> selector(Table(...))
     >>> # grouping by PROJECT, aggregating SHOT and VERSION
@@ -157,7 +158,7 @@ class Sorter(Operator):
 
     Methods
     -------
-    call: return a generator with the sorted data by the specified tuple of pairs
+    call: return a generator with data sorted by specified names
     >>> sorter = Sorter('PROJECT,SHOT,VERSION')
     >>> sorter(Table(...))
     '''
@@ -172,37 +173,63 @@ class Filter:
     '''
     Summary
     -------
-    Filter the specified data by specified column value.
+    Filter the specified data by specified query language which 
+    evaluates boolean AND and OR expressions in the following format:
+    >>> 'PROJECT="the hobbit" AND SHOT=1 OR SHOT=40'
+
+    AND has higher precedence than OR, parentheses can be used to 
+    change this:
+    >>> 'PROJECT="the hobbit" AND (SHOT=1 OR SHOT=40)'
 
     Arguments
     ---------
-    * query: the column name and value, separated by equal character
+    * query: the filtering query language
 
     Methods
     -------
-    call: return a generator with the filtered data by the specified table
-    >>> fil = Filter('FINISH_DATE=2006-07-22')
+    call: return a generator with the filtered data by specified query
+    >>> fil = Filter('PROJECT="the hobbit" OR PROJECT="lotr"')
     >>> fil(Table(...))
     '''
 
+    REGEX = re.compile(r'(\bAND\b|\bOR\b|=|\(|\))')
+    OPERANDS = {'OR', 'AND', '(', ')'}
+    EQUAL = '='
+
     def __init__(self, query):
-        self.name, self.value = self._query(query)
+        self.tokens = list(self._tokenize(query))
 
     def __call__(self, table):
-        qname, qvalue = self._convert(table)
+        evaluation = self._evaluate(table)
         for row in table:
+            instr = evaluation
             for name, value in row:
-                if name == qname and value == qvalue:
-                    yield(row)
-
-    def _query(self, query):
-        return tuple(name.strip() for name in str(query).split('='))
+                instr = instr.replace(name, repr(value))
+            if(eval(instr)):
+                yield(row)
     
-    def _convert(self, table):
-        columns = [col for col in table.columns if col.name == self.name]
-        if columns:
-            col = columns[0]
-            return self.name, col.value(self.value)
+    def _evaluate(self, table):
+        evaluation = []
+        names = table.column_names
+        for token in self.tokens:
+            if token in names:
+                evaluation.append(token)
+                col = [col for col in table.columns if col.name == token][0]
+            elif token == self.EQUAL:
+                evaluation.append('==')
+            elif token in self.OPERANDS:
+                evaluation.append(token.lower())
+            else:
+                if col:
+                    evaluation.append(repr(col.value(token)))
+        return ' '.join(evaluation)
+
+    def _tokenize(self, query):
+        for token in self.REGEX.split(query):
+            token = token.strip()
+            token = token.replace('"', '')
+            if token:
+                yield(token)
 
 
 class Bulk:
@@ -210,7 +237,6 @@ class Bulk:
     Summary
     -------
     Applies multiple operators to the specified table object
-
 
     Arguments
     ---------
