@@ -41,7 +41,7 @@ class CLI:
     @property
     def select(self):
         if self.opts.select:
-            return Selector(self.opts.select)
+            return Selector(self.opts.select, group=self.opts.group)
 
     def _print(self, row):
         tokens = []
@@ -58,7 +58,10 @@ class CLI:
                             help='the datastore to select data from')
         parser.add_argument('-s', '--select',
                             type=str,
-                            help='select just specified column names, separated by comma')
+                            help='select just specified column names, separated by comma, optionally prefixed by colon and aggregate name')
+        parser.add_argument('-g', '--group',
+                            type=str,
+                            help='group data by specified column name, combined by aggregates on select clause')
         parser.add_argument('-f', '--filter',
                             type=str,
                             help='filter column by specified value')
