@@ -128,7 +128,7 @@ class Table:
     def _check(self, row):
         if len(row) != len(self.columns):
             msg = 'row data does not match column specification'
-            logger.error('%s: %r', msg, row)
+            logger.error('%s: %r', msg, self.column_names)
             raise self.DataError(msg)
 
     def _keys(self, keys, column, val):

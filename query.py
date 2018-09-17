@@ -114,7 +114,7 @@ class Selector(Operator):
             for name, value in row:
                 aggregate = self.query[name]
                 if aggregate:
-                    logger.info('aggergating by %s', aggregate)
+                    logger.debug('aggergating by %s', aggregate)
                     fn = getattr(self, '_ag_%s' % aggregate)
                     fn(name, OrderedDict(row), reduced)
                 else:
