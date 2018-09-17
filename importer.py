@@ -1,6 +1,7 @@
 import gzip
 import pickle
 from os import path, stat
+from logger import BASE as logger
 
 
 class Parser:
@@ -67,11 +68,13 @@ class Storage:
         self.filename = self._filename(filename)
 
     def write(self, table):
+        logger.info('writing data to %s', self.filename)
         table = self._table(table)
         with gzip.open(self.filename, 'wb') as f:
             pickle.dump(table, f)
 
     def read(self):
+        logger.info('reading data from %s', self.filename)
         with gzip.open(self.filename, 'rb') as f:
             return pickle.load(f)
 
@@ -82,6 +85,7 @@ class Storage:
 
     def _table(self, table):
         if self._exist():
+            logger.info('appending to existing datastore %s', self.filename)
             existing = self.read()
             existing + table
             table = existing

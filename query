@@ -1,8 +1,10 @@
 #! /usr/bin/env python3
 
 from argparse import ArgumentParser
+import logging
 from sys import argv
 from importer import Storage
+from logger import BASE as logger
 from query import Filter, Sorter, Selector, Bulk
 from values import TimeVal
 
@@ -20,6 +22,7 @@ class CLI:
     def __init__(self, args=argv[1:]):
         self.args = args
         self.opts = self._parser().parse_args(self.args)
+        self._loglevel()
 
     def __call__(self):
         storage = Storage(self.opts.datastore)
@@ -53,6 +56,10 @@ class CLI:
             tokens.append(str(value))
         print(','.join(tokens))
 
+    def _loglevel(self):
+        loglevel = getattr(logging, self.opts.loglevel.upper())
+        logger.setLevel(loglevel)
+
     def _parser(self):
         parser = ArgumentParser(description=self.DESC)
         parser.add_argument('-d', '--datastore',
@@ -70,6 +77,10 @@ class CLI:
         parser.add_argument('-o', '--order',
                             type=str,
                             help='sort data by specified column names, separated by comma')
+        parser.add_argument('-l', '--loglevel',
+                            default='error',
+                            choices=('debug', 'info', 'warning', 'error', 'critical'),
+                            help='the loglevel, default to error')
         return parser
 
 

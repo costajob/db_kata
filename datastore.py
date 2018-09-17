@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from hashlib import md5
+from logger import BASE as logger
 
 
 class Column:
@@ -19,6 +20,7 @@ class Column:
     -----------
     >>> Column('VERSION', values.IntVal(), key=True, desc='the current version of the file')
     '''
+
     def __init__(self, name, value, key=False, desc=''):
         self.name = str(name)
         self.value = value
@@ -113,6 +115,7 @@ class Table:
 
     def append(self, row):
         self._check(row)
+        logger.info('appending row: %r', row)
         keys = []
         data = []
         for col, val in zip(self.columns, row):
@@ -124,7 +127,9 @@ class Table:
 
     def _check(self, row):
         if len(row) != len(self.columns):
-            raise self.DataError('row data does not match column specification')
+            msg = 'row data does not match column specification'
+            logger.error('%s: %r', msg, row)
+            raise self.DataError(msg)
 
     def _keys(self, keys, column, val):
         if column.key:
@@ -135,5 +140,6 @@ class Table:
             return md5(''.join(keys).encode()).hexdigest()
     
     def _sort(self, headers):
+        logger.info('sorting according to headers: %r', headers)
         columns  = {column.name: column for column in self.columns}
         self.columns = [columns[name] for name in headers]

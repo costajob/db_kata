@@ -30,7 +30,7 @@ The program has the following first level modules:
 
 * `values`: contains the value-objects used to represent column values and responsible to validate valid range and cast to properly type (i.e. date, time, float, int, string)   
 
-* `datastore`: contains the core logic related to data organization, such as columns information and the table object representing grouped data  
+* `datastore`: contains the core logic related to data organization, such as columns information (predefined) and the table object representing grouped data  
 
 * `importer`: contains the parsing logic and the storage (read/write) based on the `pickle` serialization module (a whole `datastore.Table` object is serialized)  
 
@@ -43,6 +43,7 @@ The `query` API is used to select, group, filter and order data from the specifi
 ```shell
 $ ./query -h
 usage: query [-h] [-d DATASTORE] [-s SELECT] [-g GROUP] [-f FILTER] [-o ORDER]
+             [-l {debug,info,warning,error,critical}]
 
 Select, group, filter and order data from the specified datastore
 
@@ -61,6 +62,8 @@ optional arguments:
   -o ORDER, --order ORDER
                         sort data by specified column names, separated by
                         comma
+  -l {debug,info,warning,error,critical}, --loglevel {debug,info,warning,error,critical}
+                        the loglevel, default to error
 ```
 
 ### Examples

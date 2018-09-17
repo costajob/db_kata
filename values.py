@@ -1,4 +1,5 @@
 from datetime import datetime
+from logger import BASE as logger
 
 
 class Val(object):
@@ -49,7 +50,9 @@ class IntVal(Val):
     def __call__(self, val):
         val = int(val)
         if val < int(self._min) or val > int(self._max):
-            raise ValueError('%s is outside of permitted range: %s-%s' % (val, self._min, self._max))
+            msg = '%s is outside of permitted range: %s-%s' % (val, self._min, self._max)
+            logger.error(msg)
+            raise ValueError(msg)
         return val
 
 
@@ -72,7 +75,9 @@ class FloatVal(IntVal):
     def __call__(self, val):
         val = float(val)
         if val < float(self._min) or val > float(self._max):
-            raise ValueError('%s is outside of permitted range: %s-%s' % (val, self._min, self._max))
+            msg = '%s is outside of permitted range: %s-%s' % (val, self._min, self._max)
+            logger.error(msg)
+            raise ValueError(msg)
         return val
 
 
@@ -108,7 +113,9 @@ class TxtVal(Val):
         val = str(val)
         val_len = len(val)
         if val_len < int(self._min) or val_len > int(self._max):
-            raise ValueError('%s length is outside of permitted range: %s-%s' % (val, self._min, self._max))
+            msg = '%s length is outside of permitted range: %s-%s' % (val, self._min, self._max)
+            logger.error(msg)
+            raise ValueError(msg)
         return val
 
 
@@ -139,7 +146,9 @@ class DateVal(Val):
         try:
             return datetime.strptime(val, self.FORMAT).date()
         except ValueError:
-            raise ValueError('%s cannot be converted to a valid date' % val)
+            msg = '%s cannot be converted to a valid date' % val
+            logger.error(msg)
+            raise ValueError(msg)
 
     def __repr__(self):
         name = self.__class__.__name__
@@ -170,4 +179,6 @@ class TimeVal(DateVal):
         try:
             return datetime.strptime(val, self.FORMAT)
         except ValueError:
-            raise ValueError('%s cannot be converted to a valid datetime' % val)
+            msg = '%s cannot be converted to a valid datetime' % val
+            logger.error(msg)
+            raise ValueError(msg)

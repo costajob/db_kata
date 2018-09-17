@@ -1,8 +1,9 @@
-from collections import defaultdict, OrderedDict
-import datetime
+from collections import OrderedDict
+import datetime # used by eval
 from numbers import Number
 from operator import itemgetter
 import re
+from logger import BASE as logger
 
 
 class Operator(object):
@@ -42,7 +43,9 @@ class Operator(object):
         for aggregate in self.query.values():
             if aggregate and aggregate not in self.aggregates:
                 valid = ','.join(self.aggregates)
-                raise self.AggregateError('%s is not a valid aggregate: %s' % (aggregate, valid))
+                msg = '%s is not a valid aggregate: %s' % (aggregate, valid)
+                logger.error(msg)
+                raise self.AggregateError(msg)
 
 
 class Selector(Operator):
@@ -60,13 +63,13 @@ class Selector(Operator):
 
     Methods
     -------
-    call: return a generator with the data selected by specified names,
-          if group is specified, group them by available aggregates
+    call: return a generator with the data selected by specified names
     >>> selector = Selector('PROJECT,SHOT,VERSION')
     >>> selector(Table(...))
-    >>> # grouping by PROJECT, aggregating SHOT and VERSION
-    >>> selector = Selector('PROJECT,SHOT:count,VERSION:collect')
-    >>> selector(Table(...), 'PROJECT')
+
+    call: if group is specified, group data by available aggregates
+    >>> selector = Selector('PROJECT,SHOT:count,VERSION:collect', 'PROJECT')
+    >>> selector(Table(...))
     '''
 
     def __init__(self, query, group=None):
@@ -75,8 +78,10 @@ class Selector(Operator):
     
     def __call__(self, data):
         if self.group:
+            logger.info('grouping data by: %r', self.names)
             yield from self._group_by(data)
         else:
+            logger.info('selecting data by: %r', self.names)
             yield from self._select(data)
 
     def _select(self, data):
@@ -109,6 +114,7 @@ class Selector(Operator):
             for name, value in row:
                 aggregate = self.query[name]
                 if aggregate:
+                    logger.info('aggergating by %s', aggregate)
                     fn = getattr(self, '_ag_%s' % aggregate)
                     fn(name, OrderedDict(row), reduced)
                 else:
@@ -167,12 +173,13 @@ class Sorter(Operator):
     '''
 
     def __call__(self, data):
+        logger.info('sorting data by: %r', self.names)
         data = (OrderedDict(row) for row in data)
         for row in sorted(data, key=itemgetter(*self.names)):
             yield(tuple(row.items()))
 
 
-class Filter:
+class Filter(Operator):
     '''
     Summary
     -------
@@ -203,11 +210,13 @@ class Filter:
         self.tokens = list(self._tokenize(query))
 
     def __call__(self, table):
+        logger.info('filtering data by: %s', ' '.join(self.tokens))
         translation = self._translate(table)
         for row in table:
             evaluation = translation
             for name, value in row:
                 evaluation = evaluation.replace(name, repr(value))
+            logger.info('evaluating expression: %s', evaluation)
             if(eval(evaluation)):
                 yield(row)
     
@@ -269,4 +278,5 @@ class Bulk:
         for op in self.operators:
             data = op(data)
         for row in data:
+            logger.debug('yielding row: %r', row)
             yield(tuple(value for _, value in row))
