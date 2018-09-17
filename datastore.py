@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from hashlib import md5
 
 
@@ -25,7 +26,7 @@ class Column:
         self.desc = str(desc)
 
     def __repr__(self):
-        return f'Column({self.name}, {self.value}, key={self.key})'
+        return 'Column(%s, %s, key=%s)' % (self.name, self.value, self.key)
 
 
 class Table:
@@ -80,7 +81,7 @@ class Table:
 
     def __init__(self, columns):
         self.columns = columns
-        self.rows = {}
+        self.rows = OrderedDict()
 
     def __len__(self):
         return len(self.rows)
@@ -99,7 +100,8 @@ class Table:
         self.rows.update(other.rows)
 
     def __repr__(self):
-        return f'Table(columns=({", ".join(self.column_names)}), rows={len(self.rows)})'
+        names = ', '.join(self.column_names)
+        return 'Table(columns=(%s), rows=%d)' % (names, len(self.rows))
 
     @property
     def column_names(self):

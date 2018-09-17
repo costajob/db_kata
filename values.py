@@ -20,7 +20,7 @@ class Val(object):
 
     def __repr__(self):
         name = self.__class__.__name__
-        return f'{name}({self._min}-{self._max})'
+        return '%s(%s-%s)' % (name, self._min, self._max)
 
 
 class IntVal(Val):
@@ -49,7 +49,7 @@ class IntVal(Val):
     def __call__(self, val):
         val = int(val)
         if val < int(self._min) or val > int(self._max):
-            raise ValueError(f'{val} is outside of permitted range: {self._min},{self._max}')
+            raise ValueError('%s is outside of permitted range: %s-%s' % (val, self._min, self._max))
         return val
 
 
@@ -72,7 +72,7 @@ class FloatVal(IntVal):
     def __call__(self, val):
         val = float(val)
         if val < float(self._min) or val > float(self._max):
-            raise ValueError(f'{val} is outside of permitted range: {self._min},{self._max}')
+            raise ValueError('%s is outside of permitted range: %s-%s' % (val, self._min, self._max))
         return val
 
 
@@ -108,7 +108,7 @@ class TxtVal(Val):
         val = str(val)
         val_len = len(val)
         if val_len < int(self._min) or val_len > int(self._max):
-            raise ValueError(f'{val} length is outside of permitted range: {self._min},{self._max}')
+            raise ValueError('%s length is outside of permitted range: %s-%s' % (val, self._min, self._max))
         return val
 
 
@@ -139,11 +139,11 @@ class DateVal(Val):
         try:
             return datetime.strptime(val, self.FORMAT).date()
         except ValueError:
-            raise ValueError(f'{val} cannot be converted to a valid date')
+            raise ValueError('%s cannot be converted to a valid date' % val)
 
     def __repr__(self):
         name = self.__class__.__name__
-        return f'{name}({self.REPR})'
+        return '%s(%s)' % (name, self.REPR)
 
 
 class TimeVal(DateVal):
@@ -170,4 +170,4 @@ class TimeVal(DateVal):
         try:
             return datetime.strptime(val, self.FORMAT)
         except ValueError:
-            raise ValueError(f'{val} cannot be converted to a valid datetime')
+            raise ValueError('%s cannot be converted to a valid datetime' % val)

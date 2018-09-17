@@ -27,7 +27,7 @@ class Operator(object):
         '''
 
     def __init__(self, query):
-        self.query = dict(self._query(query))
+        self.query = OrderedDict(self._query(query))
         self.names = tuple(self.query.keys())
         self.aggregates = {name[4:] for name in dir(self) if name.startswith('_ag_')}
 
@@ -41,7 +41,8 @@ class Operator(object):
     def _check_aggregate(self):
         for aggregate in self.query.values():
             if aggregate and aggregate not in self.aggregates:
-                raise self.AggregateError(f'{aggregate} is not a valid aggregate: {",".join(self.aggregates)}')
+                valid = ','.join(self.aggregates)
+                raise self.AggregateError('%s is not a valid aggregate: %s' % (aggregate, valid))
 
 
 class Selector(Operator):
@@ -93,21 +94,23 @@ class Selector(Operator):
             yield(self._aggregate(group))
 
     def _groups(self, data):
-        groups = defaultdict(list)
+        groups = OrderedDict()
         for row in self._select(data):
             for name, value in row:
                 if name == self.group:
+                    if value not in groups:
+                        groups[value] = []
                     groups[value].append(row)
         return groups
 
     def _aggregate(self, group):
-        reduced = {}
+        reduced = OrderedDict()
         for row in group:
             for name, value in row:
                 aggregate = self.query[name]
                 if aggregate:
-                    fn = getattr(self, f'_ag_{aggregate}')
-                    fn(name, dict(row), reduced)
+                    fn = getattr(self, '_ag_%s' % aggregate)
+                    fn(name, OrderedDict(row), reduced)
                 else:
                     reduced[name] = value
         return self._transform(reduced)
@@ -118,7 +121,7 @@ class Selector(Operator):
                 aggregate = self.query[name]
                 if aggregate == 'collect':
                     items = ','.join(sorted(str(e) for e in value))
-                    reduced[name] = f'[{items}]'
+                    reduced[name] = '[%s]' % items
                 elif aggregate == 'count':
                     reduced[name] = len(value)
         return tuple(reduced.items())
@@ -164,7 +167,7 @@ class Sorter(Operator):
     '''
 
     def __call__(self, data):
-        data = (dict(row) for row in data)
+        data = (OrderedDict(row) for row in data)
         for row in sorted(data, key=itemgetter(*self.names)):
             yield(tuple(row.items()))
 

@@ -77,7 +77,7 @@ class Storage:
 
     def _filename(self, filename):
         if not filename.endswith(self.EXT):
-            filename = f'{filename}{self.EXT}' 
+            filename = '%s%s' % (filename, self.EXT)
         return path.abspath(filename)
 
     def _table(self, table):

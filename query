@@ -14,7 +14,7 @@ class CLI:
     A plain CLI wrapper over the query.Bulk class.
     '''
 
-    DESC = 'Select data from the specified datastore, by applying a set of operators.'
+    DESC = 'Select, group, filter and order data from the specified datastore'
     DEFAULT = './stubs/projects'
 
     def __init__(self, args=argv[1:]):
@@ -55,7 +55,7 @@ class CLI:
         parser = ArgumentParser(description=self.DESC)
         parser.add_argument('-d', '--datastore',
                             default=self.DEFAULT,
-                            help='the datastore to select data from')
+                            help='the path of the datastore file to select data from')
         parser.add_argument('-s', '--select',
                             type=str,
                             help='select just specified column names, separated by comma, optionally prefixed by colon and aggregate name')

@@ -10,6 +10,6 @@ finish  = ds.Column('FINISH_DATE', v.DateVal(), desc='the date the work on the s
 bid     = ds.Column('INTERNAL_BID', v.FloatVal(), desc='the amount of days we estimate the work on this shot will take')
 created = ds.Column('CREATED_DATE', v.TimeVal(), desc='the time and date when this record is being added to the system')
 COLUMNS = (project, shot, version, status, finish, bid, created)
-TABLE   = ds.Table(COLUMNS)
 ROWS    = list(im.Parser('./stubs/sample.txt'))
 SHUFFLE = list(im.Parser('./stubs/shuffled.txt'))
+TABLE   = ds.Table.factory(ROWS, COLUMNS)

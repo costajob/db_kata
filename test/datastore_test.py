@@ -36,10 +36,11 @@ class TestDatastore(unittest.TestCase):
 
     def test_append_row(self):
         _id = '7889a3193abeffbc23ee75d431226a8a'
-        TABLE.append(ROWS[1])
-        self.assertEqual(len(TABLE), 1)
-        self.assertIn(_id, TABLE)
-        self.assertEqual(TABLE[_id], ('the hobbit', '1', 64, 'scheduled', date(2010, 5, 15), 45.00, datetime(2010, 4, 1, 13, 35)))
+        table = ds.Table(COLUMNS)
+        table.append(ROWS[1])
+        self.assertEqual(len(table), 1)
+        self.assertIn(_id, table)
+        self.assertEqual(table[_id], ('the hobbit', '1', 64, 'scheduled', date(2010, 5, 15), 45.00, datetime(2010, 4, 1, 13, 35)))
 
     def test_merge_rows(self):
         _id = '70d72c0c1a323dd355d22961ea77857e'
