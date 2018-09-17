@@ -48,6 +48,8 @@ class CLI:
         for value in row:
             if hasattr(value, 'strptime'):
                 value = value.strftime(TimeVal.FORMAT)
+            elif isinstance(value, float):
+                value = '%.2f' % value
             tokens.append(str(value))
         print(','.join(tokens))
 

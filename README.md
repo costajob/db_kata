@@ -68,10 +68,10 @@ optional arguments:
 #### Select all
 ```shell
 $ ./query
-the hobbit,1,64,scheduled,2010-05-15,45.0,2010-04-01 13:35
-lotr,3,16,finished,2001-05-15,15.0,2001-04-01 06:47
-king kong,42,128,not required,2006-07-22,30.0,2006-10-15 09:14
-the hobbit,40,32,finished,2010-05-15,22.8,2010-03-22 01:10
+the hobbit,1,64,scheduled,2010-05-15,45.00,2010-04-01 13:35
+lotr,3,16,finished,2001-05-15,15.00,2001-04-01 06:47
+king kong,42,128,not required,2006-07-22,30.00,2006-10-15 09:14
+the hobbit,40,32,finished,2010-05-15,22.80,2010-03-22 01:10
 ```
 
 #### Select and order
@@ -86,23 +86,23 @@ the hobbit,1,64,scheduled,2010-05-15
 #### Select and group
 ```shell
 $ ./query -s PROJECT,VERSION:max,INTERNAL_BID:sum,SHOT:collect,STATUS:count -g PROJECT
-the hobbit,64,67.8,[1,40],2
-lotr,16,15.0,[3],1
-king kong,128,30.0,[42],1
+the hobbit,64,67.80,[1,40],(2)
+lotr,16,15.00,[3],(1)
+king kong,128,30.00,[42],(1)
 ```
 
 #### Select and filter
 ```shell
 $ ./query -s PROJECT,INTERNAL_BID,VERSION -f 'PROJECT="the hobbit" AND (SHOT=1 OR SHOT=40)'
-the hobbit,45.0,64
-the hobbit,22.8,32
+the hobbit,45.00,64
+the hobbit,22.80,32
 ```
 
 #### Combine all
 ```shell
 $ ./query -s PROJECT,VERSION:max,INTERNAL_BID:sum,SHOT:collect,FINISH_DATE -g PROJECT -f 'PROJECT="the hobbit" OR PROJECT="lotr"' -o FINISH_DATE
-lotr,16,15.0,[3],2001-05-15
-the hobbit,64,67.8,[1,40],2010-05-15
+lotr,16,15.00,[3],2001-05-15
+the hobbit,64,67.80,[1,40],2010-05-15
 ```
 
 ## Tests

@@ -15,7 +15,7 @@ class TestQuery(unittest.TestCase):
         selector = qy.Selector('PROJECT,VERSION:max,INTERNAL_BID:sum,SHOT:collect,STATUS:count', 'PROJECT')
         data = list(selector(TABLE))
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0], (('PROJECT', 'the hobbit'), ('VERSION', 64), ('INTERNAL_BID', 67.8), ('SHOT', '[1,40]'), ('STATUS', 2)))
+        self.assertEqual(data[0], (('PROJECT', 'the hobbit'), ('VERSION', 64), ('INTERNAL_BID', 67.8), ('SHOT', '[1,40]'), ('STATUS', '(2)')))
 
     def test_grouping_error(self):
         selector = qy.Selector('PROJECT,INTERNAL_BID:reduce', 'PROJECT')

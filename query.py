@@ -123,7 +123,7 @@ class Selector(Operator):
                     items = ','.join(sorted(str(e) for e in value))
                     reduced[name] = '[%s]' % items
                 elif aggregate == 'count':
-                    reduced[name] = len(value)
+                    reduced[name] = '(%d)' % len(value)
         return tuple(reduced.items())
 
     def _ag_max(self, name, row, reduced):
