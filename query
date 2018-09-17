@@ -3,10 +3,10 @@
 from argparse import ArgumentParser
 import logging
 from sys import argv
-from importer import Storage
-from logger import BASE as logger
-from query import Filter, Sorter, Selector, Bulk
-from values import TimeVal
+from weta_db.importer import Storage
+from weta_db.logger import BASE as logger
+from weta_db.query import Filter, Sorter, Selector, Bulk
+from weta_db.values import TimeVal
 
 
 class CLI:

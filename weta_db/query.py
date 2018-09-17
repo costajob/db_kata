@@ -3,7 +3,7 @@ import datetime # used by eval
 from numbers import Number
 from operator import itemgetter
 import re
-from logger import BASE as logger
+from weta_db.logger import BASE as logger
 
 
 class Operator(object):

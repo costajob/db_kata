@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from hashlib import md5
-from logger import BASE as logger
+from weta_db.logger import BASE as logger
 
 
 class Column:

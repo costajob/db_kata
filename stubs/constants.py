@@ -1,15 +1,15 @@
-import datastore as ds
-import importer as im
-import values as v
+from weta_db.datastore import Column, Table
+from weta_db.importer import Parser
+from weta_db.values import DateVal, FloatVal, IntVal, TimeVal, TxtVal
 
-project = ds.Column('PROJECT', v.TxtVal(), True, desc='the project name or code name of the shot')
-shot    = ds.Column('SHOT', v.TxtVal(), True, desc='the name of the shot')
-version = ds.Column('VERSION', v.IntVal(), True, desc='the current version of the file')
-status  = ds.Column('STATUS', v.TxtVal(_max=32), desc='the current status of the shot')
-finish  = ds.Column('FINISH_DATE', v.DateVal(), desc='the date the work on the shot is scheduled to end')
-bid     = ds.Column('INTERNAL_BID', v.FloatVal(), desc='the amount of days we estimate the work on this shot will take')
-created = ds.Column('CREATED_DATE', v.TimeVal(), desc='the time and date when this record is being added to the system')
+project = Column('PROJECT', TxtVal(), True, desc='the project name or code name of the shot')
+shot    = Column('SHOT', TxtVal(), True, desc='the name of the shot')
+version = Column('VERSION', IntVal(), True, desc='the current version of the file')
+status  = Column('STATUS', TxtVal(_max=32), desc='the current status of the shot')
+finish  = Column('FINISH_DATE', DateVal(), desc='the date the work on the shot is scheduled to end')
+bid     = Column('INTERNAL_BID', FloatVal(), desc='the amount of days we estimate the work on this shot will take')
+created = Column('CREATED_DATE', TimeVal(), desc='the time and date when this record is being added to the system')
 COLUMNS = (project, shot, version, status, finish, bid, created)
-ROWS    = list(im.Parser('./stubs/sample.txt'))
-SHUFFLE = list(im.Parser('./stubs/shuffled.txt'))
-TABLE   = ds.Table.factory(ROWS, COLUMNS)
+ROWS    = list(Parser('./stubs/sample.txt'))
+SHUFFLE = list(Parser('./stubs/shuffled.txt'))
+TABLE   = Table.factory(ROWS, COLUMNS)

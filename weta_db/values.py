@@ -1,5 +1,5 @@
 from datetime import datetime
-from logger import BASE as logger
+from weta_db.logger import BASE as logger
 
 
 class Val(object):
