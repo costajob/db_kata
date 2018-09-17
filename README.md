@@ -107,8 +107,11 @@ the hobbit,64,67.8,[1,40],2010-05-15
 
 ## Tests
 The whole program is covered by fast, isolated unit tests by using the standard `unittest` module.  
-
 A single executable will run all of the available unit tests:
+
 ```shell
-./run_tests
+$ ./run_tests
+..........................................
+----------------------------------------------------------------------
+Ran 42 tests in 0.013s
 ```
