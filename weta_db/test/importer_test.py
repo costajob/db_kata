@@ -18,7 +18,7 @@ class TestImporter(unittest.TestCase):
 
     def test_storage_filename(self):
         storage = Storage('./stubs/projects')
-        self.assertTrue(storage.filename.endswith('/weta_python/stubs/projects.pickle'))
+        self.assertTrue(storage.filename.endswith('/stubs/projects.pickle'))
 
     def test_storage_io(self):
         self.storage.write(TABLE)
