@@ -3,9 +3,7 @@
 * [Scope](#scope)
 * [Python](#python)
 * [Design](#design)
-  * [Modules](#modules)
 * [APIs](#apis)
-  * [Examples](#examples)
 * [Tests](#tests)
 
 ## Scope
