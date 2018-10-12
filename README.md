@@ -7,7 +7,8 @@
 * [Tests](#tests)
 
 ## Scope
-This program is the implementation of the in-memory database kata for the Python programming language.
+This program is the implementation of the in-memory database kata for the Python programming language.  
+Check `OBJECTIVES.md` file form more details.
 
 ## Python
 The program works with Python versions equal or greater than 3.3 (since the `yield from` construct is used on the `query` module).  
