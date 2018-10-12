@@ -7,19 +7,15 @@
 * [Tests](#tests)
 
 ## Scope
-This program is the implementation of the [Weta Digital](https://www.wetafx.co.nz/) kata for the Python Senior developer position.
+This program is the implementation of the in-memory database kata for the Python programming language.
 
 ## Python
 The program works with Python versions equal or greater than 3.3 (since the `yield from` construct is used on the `query` module).  
 The program has no external dependencies from the available standard library (as requested).  
 This program has been tested with the following Python's versions:
-
 * 3.3.1  
-
 * 3.4.8  
-
 * 3.6.4  
-
 * 3.7.0  
 
 ## Design
@@ -27,13 +23,9 @@ The program has been implemented by following the single responsibility principl
 
 ### Modules
 The program has the following first level modules:  
-
 * `values`: contains the value-objects used to represent column values and responsible to validate valid range and cast to properly type (i.e. date, time, float, int, string)   
-
 * `datastore`: contains the core logic related to data organization, such as columns information (predefined) and the table object representing grouped data  
-
 * `importer`: contains the parsing logic and the storage (read/write) based on the `pickle` serialization module (a whole `datastore.Table` object is serialized)  
-
 * `query`: contains the core logic used by the CLI API to select, group, filter and sort stored data  
 
 ## APIs
@@ -114,7 +106,4 @@ A single executable will run all of the available unit tests:
 
 ```shell
 $ ./run_tests
-..........................................
-----------------------------------------------------------------------
-Ran 42 tests in 0.013s
 ```
