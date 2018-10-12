@@ -1,7 +1,7 @@
 import gzip
 import pickle
 from os import path, stat
-from weta_db.logger import BASE as logger
+from db_kata.logger import BASE as logger
 
 
 class Parser:

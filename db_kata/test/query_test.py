@@ -1,6 +1,6 @@
 from datetime import date, datetime
 import unittest
-from weta_db.query import Bulk, Filter, Operator, Selector, Sorter
+from db_kata.query import Bulk, Filter, Operator, Selector, Sorter
 from stubs.constants import TABLE
 
 

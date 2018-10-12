@@ -1,6 +1,6 @@
 from datetime import date, datetime
 import unittest
-from weta_db.datastore import Table
+from db_kata.datastore import Table
 from stubs.constants import COLUMNS, ROWS, SHUFFLE, TABLE
 
 

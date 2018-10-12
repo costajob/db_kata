@@ -1,6 +1,6 @@
-from weta_db.datastore import Column, Table
-from weta_db.importer import Parser
-from weta_db.values import DateVal, FloatVal, IntVal, TimeVal, TxtVal
+from db_kata.datastore import Column, Table
+from db_kata.importer import Parser
+from db_kata.values import DateVal, FloatVal, IntVal, TimeVal, TxtVal
 
 project = Column('PROJECT', TxtVal(), True, desc='the project name or code name of the shot')
 shot    = Column('SHOT', TxtVal(), True, desc='the name of the shot')

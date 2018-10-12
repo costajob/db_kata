@@ -1,1 +1,0 @@
-name = 'weta_db'

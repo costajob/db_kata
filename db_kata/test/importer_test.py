@@ -1,7 +1,7 @@
 from tempfile import NamedTemporaryFile
 import unittest
-from weta_db.datastore import Table
-from weta_db.importer import Parser, Storage
+from db_kata.datastore import Table
+from db_kata.importer import Parser, Storage
 from stubs.constants import COLUMNS, ROWS, TABLE
 
 

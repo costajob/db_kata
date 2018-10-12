@@ -1,6 +1,6 @@
 from datetime import date, datetime
 import unittest
-from weta_db.values import DateVal, FloatVal, IntVal, TimeVal, TxtVal
+from db_kata.values import DateVal, FloatVal, IntVal, TimeVal, TxtVal
 
 
 class TestValues(unittest.TestCase):
